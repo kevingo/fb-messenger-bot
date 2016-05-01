@@ -1,7 +1,14 @@
 var express = require('express')
 var bodyParser = require('body-parser')
 var request = require('request')
+var https = require('https')
+var fs = require('fs')
 var app = express()
+
+var options = {
+  key: fs.readFileSync('./privatekey.pem'),
+  cert: fs.readFileSync('./certificate.pem')
+};
 
 app.set('port', (process.env.PORT || 5000))
 
@@ -28,3 +35,5 @@ app.get('/webhook/', function (req, res) {
 app.listen(app.get('port'), function() {
     console.log('running on port', app.get('port'))
 })
+
+https.createServer(options, app).listen(process.env.SSLPORT || 5001);
