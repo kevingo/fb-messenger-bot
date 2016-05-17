@@ -1,7 +1,11 @@
-var express = require('express')
-var bodyParser = require('body-parser')
-var request = require('request')
-var app = express()
+var express = require('express');
+var bodyParser = require('body-parser');
+var request = require('request');
+var config = require('./configs/config.js');
+var redis = require('redis');
+    client = redis.createClient();
+var app = express();
+var token = config.token;
 
 app.set('port', (process.env.PORT || 5000))
 app.use(bodyParser.urlencoded({extended: false}))
@@ -29,8 +33,24 @@ app.post('/webhook/', function (req, res) {
             var space = text.indexOf(' ');
             var name = text.substring(0, space);
             var msg = '';
+
             if (name === '你') {
             	msg = '你比較苦...';
+            } else if (name === 'nba') {
+                var key = 'nba-' + text.substring(space, text.length).trim();
+                getData(key, function(err, data) {
+                    if (err || !data) {
+                        return sendTextMessage(sender, 'oops. 沒有比賽');
+                    }
+
+                    var todayData = JSON.parse(data);
+                    var games = todayData.games;
+                    for (var i = 0 ; i < games.game.length ; i++) {
+                        msg += games.game[i].home.nickname + ' V.S. ' + games.game[i].visitor.nickname + '\n'
+                             + games.game[i].home.score + ':' + games.game[i].visitor.score + '\n'
+                    }
+                    return sendTextMessage(sender, msg);
+                });
             } else {
             	msg = name + ' 心裡苦，但是 ' + name + ' 不說';
             }
@@ -38,7 +58,16 @@ app.post('/webhook/', function (req, res) {
         }
     }
     res.sendStatus(200)
-})
+});
+
+function getData(key, callback) {
+    client.get(key, function(err, reply) {
+        if (err) {
+            callback(err, null);
+        }
+        return callback(null, reply);
+    });
+}
 
 function sendTextMessage(sender, text) {
     messageData = {
@@ -58,7 +87,7 @@ function sendTextMessage(sender, text) {
         } else if (response.body.error) {
             console.log('Error: ', response.body.error)
         }
-    })
+    });
 }
 
 app.listen(app.get('port'), function() {
