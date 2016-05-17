@@ -5,7 +5,7 @@ var bodyParser = require('body-parser');
 var request = require('request');
 var config = require('./configs/config.js');
 var redis = require('redis');
-    client = redis.createClient();
+var client = redis.createClient();
 var app = express();
 var token = config.token;
 
