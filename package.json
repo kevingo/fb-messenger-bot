@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
-    "start": "cp src/configs/config.js src/ && node src/index.js"
+    "build": "cp src/configs/config.js src/",
+    "start": "&& node src/index.js"
   },
   "repository": {
     "type": "git",
