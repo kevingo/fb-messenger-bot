@@ -70,7 +70,7 @@ function getData(key, callback) {
 }
 
 function sendTextMessage(sender, text) {
-    messageData = {
+    var messageData = {
         text:text
     }
     request({
