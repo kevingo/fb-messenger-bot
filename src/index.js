@@ -1,3 +1,5 @@
+'use strict'
+
 var express = require('express');
 var bodyParser = require('body-parser');
 var request = require('request');
@@ -34,9 +36,7 @@ app.post('/webhook/', function (req, res) {
             var name = text.substring(0, space);
             var msg = '';
 
-            if (name === '你') {
-            	msg = '你比較苦...';
-            } else if (name === 'nba') {
+            if (name === 'nba') {
                 var key = 'nba-' + text.substring(space, text.length).trim();
                 getData(key, function(err, data) {
                     if (err || !data) {
@@ -52,9 +52,9 @@ app.post('/webhook/', function (req, res) {
                     return sendTextMessage(sender, msg);
                 });
             } else {
-            	msg = name + ' 心裡苦，但是 ' + name + ' 不說';
+                msg = 'Hi, nice to meet you.';
+                sendTextMessage(sender, msg);
             }
-            sendTextMessage(sender, msg)
         }
     }
     res.sendStatus(200)
